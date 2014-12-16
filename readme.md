@@ -1,6 +1,6 @@
 # Confront
 
-### your environment _con_figuration _front_loader
+### Your environment configuration frontloader
 
-`gulp test
+more soon, i promise
 
