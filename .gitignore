@@ -1,0 +1,25 @@
+
+# OS garbage
+
+.DS_Store
+*/.DS_Store
+*/Thumbs.db
+
+
+# node
+
+node_modules/
+
+
+# dev
+
+.idea
+.idea/*
+-sublime/
+*.sublime-*
+
+
+# build
+
+build/*
+
