@@ -142,7 +142,10 @@ Confront.getPackageConfig = function() {
     var mainDir = getBaseDirectory();
     var pkgFile = path.resolve(mainDir, 'package.json');
     console.log('trying for /package.json ...', pkgFile);
-    return getFileData(pkgFile).config || null;
+    var pkgData = getFileData(pkgFile);
+    if(pkgData && pkgData.config)
+        return pkgData.config;
+    return null;
 };
 
 
