@@ -212,7 +212,7 @@ Confront.getCommandLineConfig = function() {
 
         if (opt.match(/--/)) return; // other node options, ignore/skip
 
-        if (opt.match(/-[a-z]/)) {
+        if (opt.match(/$\-[a-z]/)) {
             currentCommand = opt.slice(1); // remove the leading dash
             currentOptions = '';
         }
