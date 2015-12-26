@@ -63,6 +63,10 @@ function makeJSON(alledgedJson){
     return objFromJson;
 }
 
+function toCamel(myString) {
+    if(!myString) return myString;
+    return myString.replace(/-([a-z])/g, function (g) { return g[1].toUpperCase(); });
+}
 
 
 function tryUrlParse(suspectURL) {
@@ -178,6 +182,7 @@ Confront.getCommandLineConfig = function() {
 
         if (opt.match(/^-[a-z]/)) {
             currentCommand = opt.slice(1); // remove the leading dash
+            currentCommand = toCamel(currentCommand);
             currentOptions = '';
         }
         else {
