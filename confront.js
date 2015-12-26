@@ -76,7 +76,7 @@ function tryUrlParse(suspectURL) {
 
 
 // statics
-
+Confront.detect = // alias
 Confront.determineConfig = function() {
 
     var finalConfig = {};
