@@ -221,7 +221,7 @@ Confront.getCommandLineConfig = function() {
         }
 
         if(currentCommand) {
-            options[currentCommand] = currentOptions.trim();
+            options[currentCommand] = currentOptions.trim() || true;
             currentOptions = '';
         }
 
