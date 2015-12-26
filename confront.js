@@ -78,6 +78,7 @@ function tryUrlParse(suspectURL) {
 }
 
 
+// working, but not convinced we need this functionality
 function realmFilter(data) {
     var cRealm = cc.realm;
     var realmOverride = null;
@@ -110,8 +111,6 @@ Confront.determineConfig = function() {
     cc.realm = realm;
 
     var pkgConfig   = Confront.getPackageConfig();
-
-
     var localConfig = Confront.getLocalConfig();
     var realmConfig = Confront.getRealmConfig(realm);
 
@@ -161,10 +160,8 @@ Confront.getPackageConfig = function() {
     if(!fileData) return null;
 
     var pkgData = makeJSON(fileData.toString());
-    if(!pkgData.config) return null;
 
-    var pkgConfig = realmFilter(pkgData.config);
-    return pkgConfig || null;
+    return pkgData.config || null;
 }
 
 
