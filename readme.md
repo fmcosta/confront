@@ -19,7 +19,7 @@ node file.js -realm some-other-realm
 
 (2) we read static configs and override in the following order:
 
-- package.json{.config}
+- {package.json}.config
 - config.json
 - `realm`.json
 
