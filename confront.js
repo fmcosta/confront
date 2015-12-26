@@ -16,7 +16,8 @@ var _debug = false;
 
 var cc = {
     configFile: 'config.json',
-    configFolder: null
+    configFolder: null,
+    realm: 'default'
 };
 
 
@@ -77,6 +78,17 @@ function tryUrlParse(suspectURL) {
 }
 
 
+function realmFilter(data) {
+    var cRealm = cc.realm;
+    var realmOverride = null;
+    if(data.realm) {
+        realmOverride = data.realm[realm];
+        delete data.realm;
+    }
+    if(realmOverride) extend(data, realmOverride)
+    return data;
+}
+
 
 
 
@@ -92,10 +104,15 @@ Confront.determineConfig = function() {
     realm = String(realm).toLowerCase();
 
     var cliConfig = Confront.getCommandLineConfig();
-    realm = cliConfig.realm || realm; // override, if found
+    if(cliConfig.realm) realm = cliConfig.realm;
 
-    var pkgConfig    = Confront.getPackageConfig();
-    var localConfig  = Confront.getLocalConfig();
+    // realm should be settled by this point
+    cc.realm = realm;
+
+    var pkgConfig   = Confront.getPackageConfig();
+
+
+    var localConfig = Confront.getLocalConfig();
     var realmConfig = Confront.getRealmConfig(realm);
 
     finalConfig.realm = realm;
@@ -144,8 +161,10 @@ Confront.getPackageConfig = function() {
     if(!fileData) return null;
 
     var pkgData = makeJSON(fileData.toString());
+    if(!pkgData.config) return null;
 
-    return pkgData.config || null;
+    var pkgConfig = realmFilter(pkgData.config);
+    return pkgConfig || null;
 }
 
 
