@@ -82,7 +82,7 @@ function realmFilter(data) {
     var cRealm = cc.realm;
     var realmOverride = null;
     if(data.realm) {
-        realmOverride = data.realm[realm];
+        realmOverride = data.realm[cRealm];
         delete data.realm;
     }
     if(realmOverride) extend(data, realmOverride)
