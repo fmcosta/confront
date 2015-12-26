@@ -203,6 +203,8 @@ Confront.getCommandLineConfig = function() {
 
     allargs.forEach(function(opt, idx) {
 
+        if(!idx) return; // skip the shell command
+        
         if (opt.match(/--debug/)) { // node REPL flag
             options.debug = true;
             return; 
