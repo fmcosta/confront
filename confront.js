@@ -222,6 +222,10 @@ Confront.getCommandLineConfig = function() {
 
         if(currentCommand) {
             options[currentCommand] = currentOptions.trim();
+            currentOptions = '';
+        }
+
+        if(currentCommand && currentOptions) {
             currentCommand = '';
             currentOptions = '';
         }
