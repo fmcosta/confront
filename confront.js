@@ -11,7 +11,7 @@ var fs   = require('fs'),
 
 var extend = require('util')._extend;
 
-var _debug = false;
+var DEBUG = false;
 
 
 var cc = {
@@ -22,19 +22,31 @@ var cc = {
 
 
 function Confront(options) {
+    /*
+        Your friendly environment configuration frontloader
 
-    if(options && typeof options === 'object') {
-        // configure some stuff...
-        if(options.debug === true) _debug = true;
-        extend(cc, options);
-    }
+        Usage:
+            confront = require('confront');
+            confront(usageOptions)
 
+            var config = confront.detect();
+
+     */
+    if(options) configure(options);
     return Confront;
 }
 
 
 
 // privates
+
+function configure(_config) {
+    if(!_config) return;
+    if(_config instanceof Object) {
+        if(_config.debug === true) DEBUG = true;
+        extend(cc, options);
+    }
+}
 
 function makeJSON(alledgedJson){
     if (alledgedJson.toString)
@@ -51,16 +63,6 @@ function makeJSON(alledgedJson){
     return objFromJson;
 }
 
-
-function getFileData(fullpath){
-
-    if(!fs.existsSync(fullpath)) return null;
-
-    var fileData = fs.readFileSync(fullpath);
-    if (!fileData) return null;
-
-    return fileData;
-}
 
 
 function tryUrlParse(suspectURL) {
@@ -80,10 +82,9 @@ function tryUrlParse(suspectURL) {
 
 // working, but not convinced we need this functionality
 function realmFilter(data) {
-    var cRealm = cc.realm;
     var realmOverride = null;
     if(data.realm) {
-        realmOverride = data.realm[cRealm];
+        realmOverride = data.realm[cc.realm];
         delete data.realm;
     }
     if(realmOverride) extend(data, realmOverride)
@@ -93,116 +94,63 @@ function realmFilter(data) {
 
 
 
+function getBaseDirectory() {
+    var baseDir = process.cwd();
+    if(process.mainModule)
+        baseDir = path.dirname(process.mainModule.filename);
+
+    return baseDir;
+}
+
+
+
+function getFileData(fullpath){
+
+    if(!fs.existsSync(fullpath)) return null;
+
+    var fileData = fs.readFileSync(fullpath);
+    if (!fileData) return null;
+   
+    return makeJSON(fileData.toString());
+}
+
+
+
+
+
+
+
+
 
 // statics
-Confront.detect = // alias
-Confront.determineConfig = function() {
 
-    var finalConfig = {};
 
-    // (1) environment variables first
-    var realm = process.env.NODE_ENV || process.env.SERVER_ENV || "default";
-    realm = String(realm).toLowerCase();
-
-    var cliConfig = Confront.getCommandLineConfig();
-    if(cliConfig.realm) realm = cliConfig.realm;
-
-    // realm should be settled by this point
-    cc.realm = realm;
-
-    var pkgConfig   = Confront.getPackageConfig();
-    var localConfig = Confront.getLocalConfig();
-    var realmConfig = Confront.getRealmConfig(realm);
-
-    finalConfig.realm = realm;
-
-    // (+) now merge in predetermined order
-    if(pkgConfig)   finalConfig = extend(finalConfig, pkgConfig);
-    if(localConfig) finalConfig = extend(finalConfig, localConfig);
-    if(realmConfig) finalConfig = extend(finalConfig, realmConfig);
-    if(cliConfig)   finalConfig = extend(finalConfig, cliConfig);
-
-    return finalConfig;
+Confront.getConfigFile = function(cfgFile) {
+    var mainDir = getBaseDirectory();
+    var configFile = path.resolve(mainDir, cc.configFolder || '', cfgFile);
+    console.log('trying for [%s]...', cfgFile, configFile);
+    return getFileData(configFile);
 };
 
 
 
-
-Confront.getConfig = function(cfgFile) {
-
-    var mainDir = process.cwd();
-    if(process.mainModule)
-        mainDir = path.dirname(process.mainModule.filename);
-
-    var configFile = path.resolve(mainDir, cfgFile);
-
-    var fileData = getFileData(configFile);
-    if(!fileData) return null;
-
-    var someConfig = makeJSON(fileData.toString());
-
-    return someConfig;
-}
-
-
-
 Confront.getPackageConfig = function() {
-
-    var mainDir = process.cwd();
-    if(process.mainModule)
-        mainDir = path.dirname(process.mainModule.filename);
-
+    var mainDir = getBaseDirectory();
     var pkgFile = path.resolve(mainDir, 'package.json');
-
-    console.log('trying for package.json...', pkgFile);
-
-    var fileData = getFileData(pkgFile);
-    if(!fileData) return null;
-
-    var pkgData = makeJSON(fileData.toString());
-
-    return pkgData.config || null;
-}
+    console.log('trying for /package.json ...', pkgFile);
+    return getFileData(pkgFile).config || null;
+};
 
 
 
 Confront.getLocalConfig = function() {
-
-    var mainDir = process.cwd();
-    if(process.mainModule)
-        mainDir = path.dirname(process.mainModule.filename);
-            
-    var localConfig = path.resolve( mainDir, cc.configFolder || '', cc.configFile )
-
-    console.log('trying for local...', localConfig);
-
-    var fileData = getFileData(localConfig);
-    if(!fileData) return null;
-
-    var localConfig = makeJSON(fileData.toString());
-
-    return localConfig;
-}
-
+    return Confront.getConfigFile(cc.configFile)
+};
 
 
 Confront.getRealmConfig = function(realm) {
     if(!realm) return null;
-
-    var mainDir = process.cwd();
-    if(process.mainModule)
-        mainDir = path.dirname(process.mainModule.filename);
-        
-    var realmConfig = path.resolve( mainDir, cc.configFolder || '', realm + '.json' )
-
-    console.log('trying for realm...', realmConfig);
-
-    var fileData = getFileData(realmConfig);
-    if(!fileData) return null;
-
-    var localConfig = makeJSON(fileData.toString());
-
-    return localConfig;
+    return Confront.getConfigFile(realm + '.json')
 };
 
 
@@ -255,11 +203,39 @@ Confront.getCommandLineConfig = function() {
 
 
 
+
+Confront.detect = // alias
+Confront.determineConfig = function() {
+
+    var finalConfig = {};
+
+    // (1) environment variables first
+    var realm = process.env.NODE_ENV || process.env.SERVER_ENV || "default";
+    realm = String(realm).toLowerCase();
+
+    var cliConfig = Confront.getCommandLineConfig();
+    if(cliConfig.realm) realm = cliConfig.realm;
+
+    // realm should be settled by this point
+    cc.realm = realm;
+
+    var pkgConfig   = Confront.getPackageConfig();
+    var localConfig = Confront.getLocalConfig();
+    var realmConfig = Confront.getRealmConfig(realm);
+
+    finalConfig.realm = realm;
+
+    // (+) now merge in predetermined order
+    if(pkgConfig)   finalConfig = extend(finalConfig, pkgConfig);
+    if(localConfig) finalConfig = extend(finalConfig, localConfig);
+    if(realmConfig) finalConfig = extend(finalConfig, realmConfig);
+    if(cliConfig)   finalConfig = extend(finalConfig, cliConfig);
+
+    return finalConfig;
+};
+
+
+
+
 exports = module.exports = Confront;
-
-
-
-
-
-
 
