@@ -199,12 +199,10 @@ Confront.getCommandLineConfig = function() {
     var currentCommand = '',
         currentOptions = '';
 
-    var allargs = [].concat(process.execArgv).concat(process.argv);
+    var allargs = [].concat(process.argv).concat(process.execArgv);
 
     allargs.forEach(function(opt, idx) {
 
-        if(!idx) return; // skip the shell command
-        
         if (opt.match(/--debug/)) { // node REPL flag
             options.debug = true;
             return; 
