@@ -203,6 +203,8 @@ Confront.getCommandLineConfig = function() {
 
     allargs.forEach(function(opt, idx) {
 
+        if(!currentCommand) currentOptions = '';
+
         if (opt.match(/--debug/)) { // node REPL flag
             options.debug = true;
             return; 
@@ -218,7 +220,11 @@ Confront.getCommandLineConfig = function() {
             if(opt) currentOptions += opt + ' ';
         }
 
-        if(currentCommand) options[currentCommand] = currentOptions.trim();
+        if(currentCommand) {
+            options[currentCommand] = currentOptions.trim();
+            currentCommand = '';
+            currentOptions = '';
+        }
     });
     
     return options;
