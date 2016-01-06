@@ -15,6 +15,7 @@ var DEBUG = false;
 
 
 var cc = {
+    ignoreCLI: false,
     configFile: 'config.json',
     configFolder: null,
     realm: 'default'
@@ -221,8 +222,8 @@ Confront.determineConfig = function() {
     var realm = process.env.NODE_ENV || process.env.SERVER_ENV || "default";
     realm = String(realm).toLowerCase();
 
-    var cliConfig = Confront.getCommandLineConfig();
-    if(cliConfig.realm) realm = cliConfig.realm;
+    var cliConfig = cc.ignoreCLI ? null : Confront.getCommandLineConfig();
+    if(cliConfig && cliConfig.realm) realm = cliConfig.realm;
 
     // realm should be settled by this point
     cc.realm = realm;
