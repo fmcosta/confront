@@ -53,4 +53,4 @@ var config = confront.detect();
 ```
 
 
-See [a relative link](options.md) for a list of options.
+See [a available options](options.md) for a catalogue of usage options.
