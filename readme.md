@@ -36,8 +36,7 @@ node server.js -port 3333 -hostname sample.foo.com -safe-mode
 
 // in server.js...
 
-var confront = require('confront') 
-// or require('confront')(`{options}`)  [a relative link](options.md)
+var confront = require('confront');   // or configure wth: confront({options});
 
 var config = confront.detect();
 
@@ -46,11 +45,12 @@ var config = confront.detect();
 	"port": "3333",
 	"hostname": "sample.foo.com",
 	"safeMode": true,
-	"someParam": "was speficied in package.json{config.someParam}",
-	"aSetting": "(found in config.json)"
+	"someParam": ...was speficied in package.json{config.someParam}
+	"aSetting": ...found in config.json, for example
 }
  */
 
 ```
 
 
+See [a relative link](options.md) for a list of options.
