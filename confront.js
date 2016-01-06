@@ -44,7 +44,7 @@ function configure(_config) {
     if(!_config) return;
     if(_config instanceof Object) {
         if(_config.debug === true) DEBUG = true;
-        extend(cc, options);
+        extend(cc, _config);
     }
 }
 
