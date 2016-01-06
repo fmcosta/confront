@@ -36,7 +36,7 @@ node server.js -port 3333 -hostname sample.foo.com -safe-mode
 
 // in server.js...
 
-config = confront.detect();
+var config = confront.detect();
 
 /*
 {
